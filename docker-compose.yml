@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: spaceexplorer_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-spaceexplorer}
+      POSTGRES_USER: ${POSTGRES_USER:-spaceexplorer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-spaceexplorer}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: spaceexplorer_api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB:-spaceexplorer};Username=${POSTGRES_USER:-spaceexplorer};Password=${POSTGRES_PASSWORD}"
+      Jwt__Secret: ${JWT_SECRET}
+      NASA_API_KEY: ${NASA_API_KEY}
+      OpenAi__ApiKey: ${OPENAI_API_KEY}
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "5000:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5000
+    container_name: spaceexplorer_frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  pgdata:

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SpaceExplorer.API/SpaceExplorer.API.csproj" />
+    <Project Path="src/SpaceExplorer.Application/SpaceExplorer.Application.csproj" />
+    <Project Path="src/SpaceExplorer.Domain/SpaceExplorer.Domain.csproj" />
+    <Project Path="src/SpaceExplorer.Infrastructure/SpaceExplorer.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SpaceExplorer.Tests/SpaceExplorer.Tests.csproj" />
+  </Folder>
+</Solution>
