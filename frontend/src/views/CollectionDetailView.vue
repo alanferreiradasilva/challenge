@@ -60,8 +60,9 @@ async function enrichItem(item: CollectionItemDto) {
     enrichResult.value = await imagesService.enrich(item.id);
     // Update item in place
     const idx = items.value.findIndex((i) => i.id === item.id);
-    if (idx !== -1)
-      items.value[idx].aiDescription = enrichResult.value.aiDescription;
+    const found = items.value[idx];
+    if (idx !== -1 && found)
+      found.aiDescription = enrichResult.value.aiDescription;
   } finally {
     enriching.value = false;
   }
@@ -90,8 +91,9 @@ async function addTag(tagName: string) {
       name: tagName.trim(),
     });
     const idx = items.value.findIndex((i) => i.id === tagTarget.value!.id);
-    if (idx !== -1 && !items.value[idx].tags.includes(tagName)) {
-      items.value[idx].tags.push(tagName.trim());
+    const found = items.value[idx];
+    if (idx !== -1 && found && !found.tags.includes(tagName)) {
+      found.tags.push(tagName.trim());
     }
     newTag.value = "";
   } finally {
@@ -106,8 +108,9 @@ async function removeTag(
 ) {
   await api.delete(`/items/${item.id}/tags/${tagId}`);
   const idx = items.value.findIndex((i) => i.id === item.id);
-  if (idx !== -1) {
-    items.value[idx].tags = items.value[idx].tags.filter((t) => t !== tagName);
+  const found = items.value[idx];
+  if (idx !== -1 && found) {
+    found.tags = found.tags.filter((t) => t !== tagName);
   }
 }
 

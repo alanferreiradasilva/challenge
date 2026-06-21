@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY SpaceExplorer.sln .
+COPY SpaceExplorer.slnx .
 COPY src/ src/
 
 RUN dotnet restore
