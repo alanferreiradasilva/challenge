@@ -46,6 +46,15 @@ public abstract class GenericRepository<TEntity, TDto, TKey>(AppDbContext contex
     {
         var entity = dto!.Adapt<TEntity>();
         entity.UpdatedAt = DateTime.UtcNow;
+
+        var tracked = await DbSet.FindAsync([entity.Id], ct);
+        if (tracked is not null)
+        {
+            Context.Entry(tracked).CurrentValues.SetValues(entity);
+            await Context.SaveChangesAsync(ct);
+            return tracked.Adapt<TDto>();
+        }
+
         DbSet.Update(entity);
         await Context.SaveChangesAsync(ct);
         return entity.Adapt<TDto>();

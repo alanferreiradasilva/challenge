@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SpaceExplorer.API.Endpoints;
 using SpaceExplorer.Infrastructure;
 using SpaceExplorer.Infrastructure.Data;
 
@@ -18,11 +19,14 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Auto-migrate on startup
+// Auto-migrate on startup (skip for InMemory)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
+    if (db.Database.IsRelational())
+        await db.Database.MigrateAsync();
 }
+
+app.RegisterEndpoints();
 
 app.Run();

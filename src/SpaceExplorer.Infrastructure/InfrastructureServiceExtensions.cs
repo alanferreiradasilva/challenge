@@ -20,9 +20,17 @@ public static class InfrastructureServiceExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // DbContext
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("Default"))
-                   .UseSnakeCaseNamingConvention());
+        if (configuration.GetValue<bool>("UseInMemoryDatabase"))
+        {
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseInMemoryDatabase("SpaceExplorerTestDb"));
+        }
+        else
+        {
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("Default"))
+                       .UseSnakeCaseNamingConvention());
+        }
 
         // Auth
         var jwtSecret = configuration["Jwt:Secret"]

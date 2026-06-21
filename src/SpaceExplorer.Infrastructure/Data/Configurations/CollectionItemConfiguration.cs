@@ -12,6 +12,8 @@ public class CollectionItemConfiguration : IEntityTypeConfiguration<CollectionIt
         builder.Property(i => i.NasaImageId).IsRequired().HasMaxLength(200);
         builder.Property(i => i.NasaImageUrl).IsRequired().HasMaxLength(1000);
         builder.Property(i => i.Title).IsRequired().HasMaxLength(300);
+        builder.Property(i => i.EarthDate).HasColumnType("date");
+        builder.Property(i => i.AiDescription).HasColumnType("text");
         builder.HasOne(i => i.Collection)
                .WithMany(c => c.Items)
                .HasForeignKey(i => i.CollectionId)
