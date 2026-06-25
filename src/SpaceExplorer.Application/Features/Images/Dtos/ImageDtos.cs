@@ -36,4 +36,7 @@ public record NasaSearchRequest(
     DateOnly? StartDate,
     DateOnly? EndDate,
     string? MediaType = "image",
-    int Page = 1);
+    int Page = 1,
+    string? Rover = null,
+    string? Camera = null,
+    string? Mission = null);

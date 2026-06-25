@@ -1,10 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY SpaceExplorer.slnx .
 COPY src/ src/
 
-RUN dotnet restore
+RUN dotnet restore src/SpaceExplorer.API/SpaceExplorer.API.csproj
 RUN dotnet publish src/SpaceExplorer.API/SpaceExplorer.API.csproj -c Release -o /publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime

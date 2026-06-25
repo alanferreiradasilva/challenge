@@ -28,13 +28,13 @@ public static class InfrastructureServiceExtensions
         else
         {
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("Default"))
+                options.UseNpgsql(configuration["SpaceExplorer:DefaultConnection"])
                        .UseSnakeCaseNamingConvention());
         }
 
         // Auth
-        var jwtSecret = configuration["Jwt:Secret"]
-            ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
+        var jwtSecret = configuration["SpaceExplorer:JwtSecret"]
+            ?? throw new InvalidOperationException("SpaceExplorer:JwtSecret is not configured.");
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

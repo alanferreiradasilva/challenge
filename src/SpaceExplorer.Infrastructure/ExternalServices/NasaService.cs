@@ -12,10 +12,21 @@ public class NasaService(HttpClient httpClient) : INasaService
 
     public async Task<PagedResult<NasaImageDto>> SearchAsync(NasaSearchRequest request, CancellationToken ct = default)
     {
-        var queryParams = new List<string>();
+        var searchTerms = new List<string>();
 
         if (!string.IsNullOrWhiteSpace(request.Query))
-            queryParams.Add($"q={Uri.EscapeDataString(request.Query)}");
+            searchTerms.Add(request.Query);
+        if (!string.IsNullOrWhiteSpace(request.Rover))
+            searchTerms.Add($"\"{Uri.EscapeDataString(request.Rover)}\" rover");
+        if (!string.IsNullOrWhiteSpace(request.Camera))
+            searchTerms.Add($"\"{Uri.EscapeDataString(request.Camera)}\" camera");
+        if (!string.IsNullOrWhiteSpace(request.Mission))
+            searchTerms.Add($"\"{Uri.EscapeDataString(request.Mission)}\" mission");
+
+        var queryParams = new List<string>();
+
+        if (searchTerms.Count > 0)
+            queryParams.Add($"q={Uri.EscapeDataString(string.Join(" ", searchTerms))}");
         if (request.StartDate.HasValue)
             queryParams.Add($"year_start={request.StartDate.Value.Year}");
         if (request.EndDate.HasValue)

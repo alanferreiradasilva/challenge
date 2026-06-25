@@ -46,5 +46,56 @@ services:
     ports:
       - "3000:80"
 
+  backend-dev:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    container_name: spaceexplorer_api_dev
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/src/SpaceExplorer.API/bin
+      - /app/src/SpaceExplorer.API/obj
+      - /app/src/SpaceExplorer.Application/bin
+      - /app/src/SpaceExplorer.Application/obj
+      - /app/src/SpaceExplorer.Domain/bin
+      - /app/src/SpaceExplorer.Domain/obj
+      - /app/src/SpaceExplorer.Infrastructure/bin
+      - /app/src/SpaceExplorer.Infrastructure/obj
+      - /app/tests/SpaceExplorer.Tests/bin
+      - /app/tests/SpaceExplorer.Tests/obj
+      - nuget_cache:/root/.nuget/packages
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB:-spaceexplorer};Username=${POSTGRES_USER:-spaceexplorer};Password=${POSTGRES_PASSWORD}"
+      Jwt__Secret: ${JWT_SECRET}
+      NASA_API_KEY: ${NASA_API_KEY}
+      OpenAi__ApiKey: ${OPENAI_API_KEY}
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    ports:
+      - "5000:8080"
+    command: >
+      sh -c "dotnet restore && dotnet watch run --project src/SpaceExplorer.API/SpaceExplorer.API.csproj --no-restore"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend-dev:
+    image: node:22-alpine
+    container_name: spaceexplorer_frontend_dev
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:5000
+      CHOKIDAR_USEPOLLING: "1"
+    ports:
+      - "5173:5173"
+    command: >
+      sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    depends_on:
+      - backend-dev
+
 volumes:
   pgdata:
+  nuget_cache:
